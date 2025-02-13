@@ -1,0 +1,13 @@
+names:
+- Images
+- garbage
+nc: 2
+roboflow:
+  license: CC BY 4.0
+  project: garbage-detection-h4vqo-r4vd1
+  url: https://universe.roboflow.com/git-lci1m/garbage-detection-h4vqo-r4vd1/dataset/1
+  version: 1
+  workspace: git-lci1m
+test: ../test/images
+train: ../train/images
+val: ../valid/images
