@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 
-# Mailtrap SMTP credentials (Replace with actual password)
+# SMTP Email Credentials (Replace with actual credentials)
 SMTP_SERVER = "sandbox.smtp.mailtrap.io"
 SMTP_PORT = 2525
 SMTP_USERNAME = "2fb7c1aa88789a"
@@ -19,11 +19,11 @@ RECEIVER_EMAIL = "abiyabiju050805@gmail.com"  # Change to actual receiver
 
 # Initialize Roboflow and download dataset
 rf = Roboflow(api_key="rnjapVu9r2SSVpSyfPHs")  
-project = rf.workspace().project("garbage-detection-h4vqo-r4vd1")  
-dataset = project.version(1).download("yolov8")
+project = rf.workspace().project("garbage-container-detection-sam7i-ktipk")  
+dataset = project.version(2).download("yolov8")
 
 # Load YOLOv8 model
-model = YOLO("yolov8n.pt")
+model = YOLO("yolov8n.pt")  # Default YOLOv8 model
 
 # Open webcam
 cap = cv2.VideoCapture(0)  # Change to a video file path if needed
@@ -72,20 +72,21 @@ try:
         results = model(frame)
 
         # Count garbage detections
-        garbage_detected = sum(1 for result in results for box in result.boxes if float(box.conf[0]) > 0.5)
-        garbage_count += garbage_detected
+        garbage_detected = 0
 
-        # Draw detections on the frame
         for result in results:
             for box in result.boxes:
                 x1, y1, x2, y2 = map(int, box.xyxy[0])
                 conf = float(box.conf[0])  # Ensure it's a float
-                label = model.names[int(box.cls[0])]
+                label = model.names[int(box.cls[0])]  # Get detected object name
 
                 if conf > 0.5:  # Confidence threshold
                     cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     cv2.putText(frame, f"{label} {conf:.2f}", (x1, y1 - 10),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                    garbage_detected += 1
+
+        garbage_count += garbage_detected  # Update global count
 
         # Save the frame as an image for email alert
         image_path = "detected_garbage.jpg"
